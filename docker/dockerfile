@@ -1,0 +1,12 @@
+FROM python:3.9.4-slim-buster
+RUN apt-get update -y && apt-get upgrade -y
+RUN pip install --upgrade pip
+
+COPY requirements.txt /srv/
+RUN pip install -r /srv/requirements.txt
+COPY docker/entrypoint.sh /srv/
+COPY *.py /srv/web/
+
+ENTRYPOINT srv/entrypoint.sh
+
+
