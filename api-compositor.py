@@ -52,7 +52,6 @@ def _get_lt_url(args):
 
 def _get_style_check_url(args):
 
-    #lt = http://localhost:7001/v2/check?text=%22Hola%22&language=ca
     LT_URL = "http://localhost:8505/"
  
     url = urllib.parse.urljoin(LT_URL, "/check")         
@@ -79,13 +78,37 @@ def call_clients(args):
     req = urllib.request.Request(lt_url)
     response = urllib.request.urlopen(req)
 
+    response_text = response.read().decode(response.info().get_param('charset') or 'utf-8')
+    lt_array = json.loads(response_text)
+
+
+
     #Style checker
     sc_url = _get_style_check_url(args)
     req = urllib.request.Request(sc_url)
     response = urllib.request.urlopen(req)
 
-    response_text = response.read()
-    resp = Response(response_text, mimetype='application/json', status = 200)
+    response_text = response.read().decode(response.info().get_param('charset') or 'utf-8')
+    sc_array = json.loads(response_text)
+
+#    print("**SC Matches")
+    lt_matches = lt_array["matches"]
+    # Join responses
+    for match in sc_array["matches"]:
+        print(match)
+        lt_matches.append(match)
+
+#    print("**LT Matches")
+    # Join responses
+#    for match in
+#        print(match)
+
+
+#    print(f"Resposta: {sc_array}")
+    json_data = json.dumps(lt_array, indent=4, separators=(',', ': '))
+    resp = Response(json_data, mimetype='application/json', status = 200)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+
     return resp
 
 if __name__ == '__main__':
